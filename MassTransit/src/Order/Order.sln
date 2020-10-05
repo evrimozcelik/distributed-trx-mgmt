@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCommon", "OrderCommon\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Api", "Order.Api\Order.Api.csproj", "{7C33B3E3-E512-43B4-8489-AAAD06FD2575}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderBus", "OrderBus\OrderBus.csproj", "{5F00A36D-1DDF-4E5C-9593-24EAC344A693}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderSaga.Service", "OrderSaga.Service\OrderSaga.Service.csproj", "{5F00A36D-1DDF-4E5C-9593-24EAC344A693}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

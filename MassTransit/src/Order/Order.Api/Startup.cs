@@ -37,7 +37,7 @@ namespace Order.Api
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.ReceiveEndpoint("event-listener", e =>
+                    cfg.ReceiveEndpoint("order-api", e =>
                     {
                         e.ConfigureConsumer<OrderReceivedConsumer>(context);
                     });

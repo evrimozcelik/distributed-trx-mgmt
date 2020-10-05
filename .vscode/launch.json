@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/MassTransit/Sample/bin/Debug/netcoreapp3.1/Sample.dll",
+            "program": "${workspaceFolder}/MassTransit/src/Order/Order.Api/bin/Debug/netcoreapp3.1/Order.Api.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MassTransit/Sample",
+            "cwd": "${workspaceFolder}/MassTransit/src/Order/Order.Api",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
