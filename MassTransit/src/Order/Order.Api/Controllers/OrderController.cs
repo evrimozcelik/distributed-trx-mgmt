@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MassTransit;
-using OrderTracking.Contracts;
+using OrderCommon.Contracts;
 using Order.Api.Models;
 
 namespace Order.Api.Controllers
@@ -15,19 +15,23 @@ namespace Order.Api.Controllers
     {
 
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ISendEndpointProvider _sendEndpointProvider;
         
         private readonly ILogger<OrderController> _logger;
 
-        public OrderController(IPublishEndpoint publishEndpoint, ILogger<OrderController> logger)
+        public OrderController(IPublishEndpoint publishEndpoint, ISendEndpointProvider sendEndpointProvider, ILogger<OrderController> logger)
         {
             _publishEndpoint = publishEndpoint;
+            _sendEndpointProvider = sendEndpointProvider;
             _logger = logger;
         }
 
         [HttpPost("/submit")]
-        public void Submit(SubmitOrder order)
+        public async Task Submit(SubmitOrder order)
         {
-            _publishEndpoint.Publish<ISubmitOrder>(order);
+            //_publishEndpoint.Publish<ISubmitOrder>(order);
+            var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:order"));
+            await sendEndpoint.Send<ISubmitOrder>(order);
         }
 
         [HttpPost("/accept")]

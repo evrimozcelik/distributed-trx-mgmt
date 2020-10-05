@@ -1,6 +1,6 @@
 using System;
 using MassTransit;
-using OrderTracking.Contracts;
+using OrderCommon.Contracts;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;

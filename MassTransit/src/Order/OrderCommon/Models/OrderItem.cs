@@ -1,4 +1,4 @@
-namespace OrderTracking.Models
+namespace OrderCommon.Models
 {
     public class OrderItem
     {

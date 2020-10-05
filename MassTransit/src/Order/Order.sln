@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderTracking", "OrderTracking\OrderTracking.csproj", "{7FB45CC5-9CA4-4DC0-BA79-0F9D916AE943}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCommon", "OrderCommon\OrderCommon.csproj", "{7FB45CC5-9CA4-4DC0-BA79-0F9D916AE943}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Api", "Order.Api\Order.Api.csproj", "{7C33B3E3-E512-43B4-8489-AAAD06FD2575}"
 EndProject

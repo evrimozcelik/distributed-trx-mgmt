@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using OrderTracking.Models;
+using OrderCommon.Models;
 
-namespace OrderTracking.Contracts
+namespace OrderCommon.Contracts
 {
     public interface ISubmitOrder
     {

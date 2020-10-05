@@ -3,16 +3,22 @@ using System.Threading.Tasks;
 using System;
 using MassTransit;
 using MassTransit.Saga;
-using OrderTracking.Saga;
-using OrderTracking.Models;
-using OrderTracking.Contracts;
+using OrderSaga.StateMachine;
+using OrderCommon.Models;
+using OrderCommon.Contracts;
+using Serilog;
 
-namespace OrderBus
+namespace OrderSaga.Service
 {
     class Program
     {
         public static async Task Main()
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .CreateLogger();
+
             var machine = new OrderStateMachine();
             var repository = new InMemorySagaRepository<OrderState>();
 
@@ -30,7 +36,8 @@ namespace OrderBus
 
             try
             {
-                Console.WriteLine("Press enter to exit");
+                Log.Information("Order Saga Service Started");
+                Log.Information("Press enter to exit");
 
                 await Task.Run(() => Console.ReadLine());
             }

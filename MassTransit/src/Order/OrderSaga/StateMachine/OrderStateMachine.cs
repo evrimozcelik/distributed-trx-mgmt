@@ -1,12 +1,12 @@
 using System.Security.Cryptography.X509Certificates;
 using System;
 using Automatonymous;
-using OrderTracking.Models;
-using OrderTracking.Contracts;
+using OrderCommon.Models;
+using OrderCommon.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OrderTracking.Saga
+namespace OrderSaga.StateMachine
 {
     public class OrderStateMachine : MassTransitStateMachine<OrderState>
     {

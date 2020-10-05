@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System;
-using OrderTracking.Contracts;
-using OrderTracking.Models;
+using OrderCommon.Contracts;
+using OrderCommon.Models;
 
 namespace Order.Api.Models
 {

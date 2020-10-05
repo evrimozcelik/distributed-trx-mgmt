@@ -1,5 +1,5 @@
 using System;
-namespace OrderTracking.Contracts
+namespace OrderCommon.Contracts
 {
     public interface IOrderReceived
     {

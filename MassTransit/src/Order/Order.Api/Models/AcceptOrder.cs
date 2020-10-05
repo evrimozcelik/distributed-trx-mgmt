@@ -1,5 +1,5 @@
 using System;
-using OrderTracking.Contracts;
+using OrderCommon.Contracts;
 
 namespace Order.Api.Models
 {

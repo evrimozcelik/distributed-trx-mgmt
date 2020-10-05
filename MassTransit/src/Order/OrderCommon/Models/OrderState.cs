@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using Automatonymous;
 
-namespace OrderTracking.Models
+namespace OrderCommon.Models
 {
 
     public class OrderState : SagaStateMachineInstance
