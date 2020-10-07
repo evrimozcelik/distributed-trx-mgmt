@@ -23,8 +23,9 @@ namespace Order.Service
             {
                 cfg.ReceiveEndpoint("order-service", e => 
                 {
-                    e.Consumer<OrderReceivedConsumer>();
+                    e.Consumer<AcceptOrderConsumer>();
                 });
+
             });
 
             var source = new CancellationTokenSource(TimeSpan.FromSeconds(10));

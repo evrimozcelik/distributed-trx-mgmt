@@ -5,6 +5,7 @@ using OrderCommon.Models;
 using OrderCommon.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace OrderSaga.StateMachine
 {
@@ -16,8 +17,12 @@ namespace OrderSaga.StateMachine
         public Event<ISubmitOrder> SubmitOrder { get; private set; }
         public Event<IOrderAccepted> OrderAccepted { get; private set; }
 
-        public OrderStateMachine()
+        private ILogger<OrderStateMachine> _logger;
+
+        public OrderStateMachine(ILogger<OrderStateMachine> logger)
         {
+            _logger = logger;
+
             InstanceState(x => x.CurrentState);
 
             Event(() => SubmitOrder, x => x.CorrelateById(context => context.Message.OrderId).SelectId(c => Guid.NewGuid()));
@@ -27,21 +32,27 @@ namespace OrderSaga.StateMachine
                 When(SubmitOrder)
                     .Then(x => x.Instance.CustomerId = x.Data.CustomerId)
                     .Then(x => x.Instance.Items = x.Data.Items)
+                    .Then(context => LogStateChange(context.Event.Name, context.Instance, context.Data))
+                    .Activity(x => x.OfInstanceType<SendAcceptOrderCommandActivity>())
+                    .Publish(context => (IOrderReceived)new OrderReceived { OrderId = context.Instance.CorrelationId })
                     .TransitionTo(Submitted)
-                    .Then(context => Console.WriteLine("Initially->SubmitOrder. Instance: {0}. Data: {1}", JsonSerializer.Serialize(context.Instance), JsonSerializer.Serialize(context.Data)))
-                    .Publish(context => (IOrderReceived)new OrderReceived {OrderId = context.Instance.CorrelationId}),
-                When(OrderAccepted)
-                    .TransitionTo(Accepted)
-                    .Then(context => Console.WriteLine("Initially->OrderAccepted. Instance: {0}. Data: {1}", JsonSerializer.Serialize(context.Instance), JsonSerializer.Serialize(context.Data))));
+                );
 
             During(Submitted,
                 When(OrderAccepted)
                     .TransitionTo(Accepted)
-                    .Then(context => Console.WriteLine("Submitted->OrderAccepted. Instance: {0}. Data: {1}", JsonSerializer.Serialize(context.Instance), JsonSerializer.Serialize(context.Data))));
+                    .Then(context => LogStateChange(context.Event.Name, context.Instance, context.Data))
+                );
 
             During(Accepted,
                 When(SubmitOrder)
-                    .Then(context => Console.WriteLine("Accepted->SubmitOrder. Instance: {0}. Data: {1}", JsonSerializer.Serialize(context.Instance), JsonSerializer.Serialize(context.Data))));
+                    .Then(context => LogStateChange(context.Event.Name, context.Instance, context.Data))
+                );
+        }
+
+        private void LogStateChange(string eventName, OrderState state, IMessage message)
+        {
+            _logger.LogInformation("{0}->{1}. Instance: {2}. Data: {3}", state.CurrentState, eventName, JsonSerializer.Serialize(state), JsonSerializer.Serialize(message));
         }
     }
 }

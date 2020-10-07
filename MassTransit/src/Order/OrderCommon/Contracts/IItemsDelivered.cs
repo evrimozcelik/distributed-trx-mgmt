@@ -1,8 +1,8 @@
 using System;
 namespace OrderCommon.Contracts
 {
-    public interface IItemsDelivered
+    public interface IItemsDelivered : IMessage
     {
-         Guid OrderId { get; }   
+        
     }
 }

@@ -3,48 +3,74 @@ using System.Threading.Tasks;
 using System;
 using MassTransit;
 using MassTransit.Saga;
-using OrderSaga.StateMachine;
 using OrderCommon.Models;
-using OrderCommon.Contracts;
+using OrderSaga.StateMachine;
 using Serilog;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace OrderSaga.Service
 {
     class Program
     {
-        public static async Task Main()
+        
+        public static async Task Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .CreateLogger();
+            var host = CreateHostBuilder(args).Build();
 
-            var machine = new OrderStateMachine();
-            var repository = new InMemorySagaRepository<OrderState>();
+            var provider = host.Services;
 
-            var busControl = Bus.Factory.CreateUsingRabbitMq(cfg =>
-            {
-                cfg.ReceiveEndpoint("order", e => 
-                {
-                    e.StateMachineSaga(machine, repository);
-                });
-            });
+            var busControl = provider.GetRequiredService<IBusControl>();
 
-            var source = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var logger = provider.GetRequiredService< ILogger<Program>>();
 
-            await busControl.StartAsync(source.Token);
+            var token = new CancellationTokenSource().Token;
 
             try
             {
-                Log.Information("Order Saga Service Started");
-                Log.Information("Press enter to exit");
+                logger.LogInformation("Order Saga Service Started");
 
-                await Task.Run(() => Console.ReadLine());
+                await busControl.StartAsync(token);
+                await host.RunAsync(token);
             }
             finally
             {
                 await busControl.StopAsync();
             }
+
         }
+
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
+                {
+
+                    services.AddMassTransit(x =>
+                    {
+                        x.SetKebabCaseEndpointNameFormatter();
+
+                        x.AddSagaStateMachine<OrderStateMachine, OrderState>()
+                            .InMemoryRepository();
+
+                        x.UsingRabbitMq((context, cfg) =>
+                        {
+                            cfg.ReceiveEndpoint("order-saga", e =>
+                            {
+                                e.ConfigureSagas(context);
+                            });
+
+                        });
+
+                    });
+
+                    services.AddScoped<SendAcceptOrderCommandActivity>();
+                    services.RegisterSagaStateMachine<OrderStateMachine, OrderState>();
+
+                });
+        }
+
     }
 }
