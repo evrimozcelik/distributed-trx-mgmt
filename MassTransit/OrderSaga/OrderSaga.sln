@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCommon", "OrderCommon\OrderCommon.csproj", "{7FB45CC5-9CA4-4DC0-BA79-0F9D916AE943}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCommon", "src\OrderCommon\OrderCommon.csproj", "{7FB45CC5-9CA4-4DC0-BA79-0F9D916AE943}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Api", "Order.Api\Order.Api.csproj", "{7C33B3E3-E512-43B4-8489-AAAD06FD2575}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Api", "src\Order.Api\Order.Api.csproj", "{7C33B3E3-E512-43B4-8489-AAAD06FD2575}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderSaga.Service", "OrderSaga.Service\OrderSaga.Service.csproj", "{5F00A36D-1DDF-4E5C-9593-24EAC344A693}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderSaga.Service", "src\OrderSaga.Service\OrderSaga.Service.csproj", "{5F00A36D-1DDF-4E5C-9593-24EAC344A693}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderSaga", "OrderSaga\OrderSaga.csproj", "{FA1A246E-183C-4718-9AD9-53D0B972A4D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderSaga", "src\OrderSaga\OrderSaga.csproj", "{FA1A246E-183C-4718-9AD9-53D0B972A4D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payment.Service", "Payment.Service\Payment.Service.csproj", "{D125446D-E682-4FB5-A794-6B7634937DF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payment.Service", "src\Payment.Service\Payment.Service.csproj", "{D125446D-E682-4FB5-A794-6B7634937DF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.Service", "Stock.Service\Stock.Service.csproj", "{0E4EEC3F-E0B6-4111-A5C3-4C205F6A4583}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.Service", "src\Stock.Service\Stock.Service.csproj", "{0E4EEC3F-E0B6-4111-A5C3-4C205F6A4583}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Service", "Order.Service\Order.Service.csproj", "{0330E041-65D7-42FC-959A-B1C3E2CC317C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Service", "src\Order.Service\Order.Service.csproj", "{0330E041-65D7-42FC-959A-B1C3E2CC317C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

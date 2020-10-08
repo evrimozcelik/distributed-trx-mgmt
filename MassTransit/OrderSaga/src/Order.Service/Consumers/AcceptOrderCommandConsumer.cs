@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Order.Service.Consumers
 {
-    public class AcceptOrderConsumer : IConsumer<IAcceptOrder>
+    public class AcceptOrderCommandConsumer : IConsumer<IAcceptOrder>
     {
 
         public async Task Consume(ConsumeContext<IAcceptOrder> context)

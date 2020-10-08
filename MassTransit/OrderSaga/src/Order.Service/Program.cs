@@ -23,7 +23,7 @@ namespace Order.Service
             {
                 cfg.ReceiveEndpoint("order-service", e => 
                 {
-                    e.Consumer<AcceptOrderConsumer>();
+                    e.Consumer<AcceptOrderCommandConsumer>();
                 });
 
             });
