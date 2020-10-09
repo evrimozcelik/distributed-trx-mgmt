@@ -43,9 +43,14 @@ namespace OrderSaga.StateMachine
         private async Task SendAcceptOrder(BehaviorContext<OrderState> context)
         {
             var sendEndpoint = await context.GetSendEndpoint(new Uri("queue:order-service"));
-            await sendEndpoint.Send<IAcceptOrder>(new { OrderId = context.Instance.CorrelationId }).ConfigureAwait(false);
+            await sendEndpoint.Send<IAcceptOrder>(new
+            {
+                OrderId = context.Instance.CorrelationId,
+                CustomerId = context.Instance.CustomerId,
+                Items = context.Instance.Items
+            }).ConfigureAwait(false);
 
-            _logger.LogInformation("IAcceptOrder command was sent");
+            _logger.LogInformation("IAcceptOrder command was sent. CorrelationId: " + context.Instance.CorrelationId);
         }
 
         public Task Faulted<TException>(BehaviorExceptionContext<OrderState, TException> context, Behavior<OrderState> next) 

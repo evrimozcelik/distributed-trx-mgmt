@@ -15,9 +15,28 @@ namespace Order.Service.Consumers
         {
             var orderCommand = context.Message;
 
-            Log.Information($"AcceptOrderConsumer. IAcceptOrder: {JsonSerializer.Serialize(orderCommand)} is received.");
+            Log.Information($"OrderId: {orderCommand.OrderId} is received.");
 
-            await context.Publish<IOrderAccepted>(new { OrderId = context.CorrelationId });
+            var accepted = true;
+            var reason = "";
+
+            if (orderCommand.Items == null || orderCommand.Items.Count == 0)
+            {
+                accepted = false;
+                reason = "missing items";
+            }
+
+
+            if (accepted)
+            {
+                await context.Publish<IOrderAccepted>(new { OrderId = orderCommand.OrderId });
+                Log.Information($"OrderId: {orderCommand.OrderId} is accepted.");
+            }
+            else
+            {
+                await context.Publish<IOrderRejected>(new { OrderId = orderCommand.OrderId, Reason = reason });
+                Log.Information($"OrderId: {orderCommand.OrderId} is rejected.");
+            }
         }
         
     }

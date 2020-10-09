@@ -14,7 +14,7 @@ namespace Order.Api.Consumers
         {
             var orderCommand = context.Message;
 
-            await Console.Out.WriteLineAsync($"OrderReceivedConsumer. orderCommand: {JsonSerializer.Serialize(orderCommand)} is received.");
+            await Console.Out.WriteLineAsync($"OrderReceivedConsumer. OrderId: {orderCommand.OrderId} is received.");
 
         }
         

@@ -7,6 +7,7 @@ using OrderCommon.Models;
 using OrderCommon.Contracts;
 using Serilog;
 using Order.Service.Consumers;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Order.Service
 {
@@ -16,7 +17,9 @@ namespace Order.Service
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.Console()
+                .WriteTo.Console(
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
+                    theme: ConsoleTheme.None)
                 .CreateLogger();
 
             var busControl = Bus.Factory.CreateUsingRabbitMq(cfg =>

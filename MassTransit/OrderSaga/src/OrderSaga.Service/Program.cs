@@ -9,6 +9,7 @@ using Serilog;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace OrderSaga.Service
 {
@@ -17,7 +18,16 @@ namespace OrderSaga.Service
         
         public static async Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console(
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
+                    theme: ConsoleTheme.None)
+                .CreateLogger();
+
+            var host = CreateHostBuilder(args)
+                .UseSerilog()
+                .Build();
 
             var provider = host.Services;
 
