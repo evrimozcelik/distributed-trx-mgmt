@@ -5,17 +5,16 @@ using GreenPipes;
 using Automatonymous;
 using System.Threading.Tasks;
 using OrderCommon.Contracts;
-using Microsoft.Extensions.Logging;
 
 namespace OrderSaga.StateMachine
 {
-    public class SendAcceptOrderCommandActivity : Activity<OrderState>
+    public class SendAcceptOrderCommand : Activity<OrderState>
     {
-        private ILogger<SendAcceptOrderCommandActivity> _logger;
+        readonly ConsumeContext _context;
 
-        public SendAcceptOrderCommandActivity(ILogger<SendAcceptOrderCommandActivity> logger)
+        public SendAcceptOrderCommand(ConsumeContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
         public void Probe(ProbeContext context)
@@ -42,10 +41,8 @@ namespace OrderSaga.StateMachine
 
         private async Task SendAcceptOrder(BehaviorContext<OrderState> context)
         {
-            var sendEndpoint = await context.GetSendEndpoint(new Uri("queue:order-service"));
+            var sendEndpoint = await _context.GetSendEndpoint(new Uri("queue:order-service"));
             await sendEndpoint.Send<IAcceptOrder>(new { OrderId = context.Instance.CorrelationId }).ConfigureAwait(false);
-
-            _logger.LogInformation("IAcceptOrder command was sent");
         }
 
         public Task Faulted<TException>(BehaviorExceptionContext<OrderState, TException> context, Behavior<OrderState> next) 

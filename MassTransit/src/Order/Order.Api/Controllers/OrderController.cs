@@ -30,7 +30,7 @@ namespace Order.Api.Controllers
         public async Task Submit(SubmitOrder order)
         {
             //_publishEndpoint.Publish<ISubmitOrder>(order);
-            var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:order-saga"));
+            var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:order"));
             await sendEndpoint.Send<ISubmitOrder>(order);
         }
 

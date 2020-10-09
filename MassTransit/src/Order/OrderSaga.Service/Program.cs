@@ -3,29 +3,31 @@ using System.Threading.Tasks;
 using System;
 using MassTransit;
 using MassTransit.Saga;
+using OrderSaga.StateMachine;
 using OrderCommon.Models;
 using OrderCommon.Contracts;
 using Serilog;
-using Order.Service.Consumers;
 
-namespace Order.Service
+namespace OrderSaga.Service
 {
     class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main()
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()
                 .CreateLogger();
 
+            var machine = new OrderStateMachine();
+            var repository = new InMemorySagaRepository<OrderState>();
+
             var busControl = Bus.Factory.CreateUsingRabbitMq(cfg =>
             {
-                cfg.ReceiveEndpoint("order-service", e => 
+                cfg.ReceiveEndpoint("order", e => 
                 {
-                    e.Consumer<AcceptOrderCommandConsumer>();
+                    e.StateMachineSaga(machine, repository);
                 });
-
             });
 
             var source = new CancellationTokenSource(TimeSpan.FromSeconds(10));
@@ -34,7 +36,7 @@ namespace Order.Service
 
             try
             {
-                Log.Information("Order Service Started");
+                Log.Information("Order Saga Service Started");
                 Log.Information("Press enter to exit");
 
                 await Task.Run(() => Console.ReadLine());

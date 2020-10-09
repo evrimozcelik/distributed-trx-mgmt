@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\OrderCommon\OrderCommon.csproj" />
+    <ProjectReference Include="..\OrderSaga\OrderSaga.csproj" />
   </ItemGroup>
 
   <ItemGroup>
