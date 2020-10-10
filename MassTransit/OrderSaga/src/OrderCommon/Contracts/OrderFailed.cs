@@ -1,7 +1,7 @@
 using System;
 namespace OrderCommon.Contracts
 {
-    public class OrderReceived : IOrderReceived
+    public class OrderFailed : IOrderFailed
     {
         public Guid OrderId { get; set;}   
     }

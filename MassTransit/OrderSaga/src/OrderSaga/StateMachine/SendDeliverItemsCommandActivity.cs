@@ -9,18 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace OrderSaga.StateMachine
 {
-    public class SendExecutePaymentCommandActivity : Activity<OrderState>
+    public class SendDeliverItemsCommandActivity : Activity<OrderState>
     {
-        private ILogger<SendExecutePaymentCommandActivity> _logger;
+        private ILogger<SendDeliverItemsCommandActivity> _logger;
 
-        public SendExecutePaymentCommandActivity(ILogger<SendExecutePaymentCommandActivity> logger)
+        public SendDeliverItemsCommandActivity(ILogger<SendDeliverItemsCommandActivity> logger)
         {
             _logger = logger;
         }
 
         public void Probe(ProbeContext context)
         {
-            context.CreateScope("send-execute-payment-command");
+            context.CreateScope("send-deliver-items-command");
         }
 
         public void Accept(StateMachineVisitor visitor)
@@ -42,15 +42,15 @@ namespace OrderSaga.StateMachine
 
         private async Task SendExecutePayment(BehaviorContext<OrderState> context)
         {
-            var sendEndpoint = await context.GetSendEndpoint(new Uri("queue:payment-service"));
-            await sendEndpoint.Send<IExecutePayment>(new
+            var sendEndpoint = await context.GetSendEndpoint(new Uri("queue:stock-service"));
+            await sendEndpoint.Send<IDeliverItems>(new
             {
                 OrderId = context.Instance.CorrelationId,
                 CustomerId = context.Instance.CustomerId,
                 Items = context.Instance.Items
             }).ConfigureAwait(false);
 
-            _logger.LogInformation("IExecutePayment command was sent. CorrelationId: " + context.Instance.CorrelationId);
+            _logger.LogInformation("IDeliverItems command was sent. CorrelationId: " + context.Instance.CorrelationId);
         }
 
         public Task Faulted<TException>(BehaviorExceptionContext<OrderState, TException> context, Behavior<OrderState> next) 

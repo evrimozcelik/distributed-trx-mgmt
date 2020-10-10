@@ -1,7 +1,7 @@
 using System;
 namespace OrderCommon.Contracts
 {
-    public interface IPaymentFailed : IMessage
+    public interface IOrderFailed : IMessage
     {
 
     }

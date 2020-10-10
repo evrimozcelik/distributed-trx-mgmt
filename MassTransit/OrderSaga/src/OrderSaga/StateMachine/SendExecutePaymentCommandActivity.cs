@@ -9,18 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace OrderSaga.StateMachine
 {
-    public class SendAcceptOrderCommandActivity : Activity<OrderState>
+    public class SendExecutePaymentCommandActivity : Activity<OrderState>
     {
-        private ILogger<SendAcceptOrderCommandActivity> _logger;
+        private ILogger<SendExecutePaymentCommandActivity> _logger;
 
-        public SendAcceptOrderCommandActivity(ILogger<SendAcceptOrderCommandActivity> logger)
+        public SendExecutePaymentCommandActivity(ILogger<SendExecutePaymentCommandActivity> logger)
         {
             _logger = logger;
         }
 
         public void Probe(ProbeContext context)
         {
-            context.CreateScope("send-accept-order-command");
+            context.CreateScope("send-execute-payment-command");
         }
 
         public void Accept(StateMachineVisitor visitor)
@@ -30,27 +30,27 @@ namespace OrderSaga.StateMachine
 
         public async Task Execute(BehaviorContext<OrderState> context, Behavior<OrderState> next)
         {
-            await SendAcceptOrder(context);     
+            await SendExecutePayment(context);     
             await next.Execute(context).ConfigureAwait(false);
         }
 
         public async Task Execute<T>(BehaviorContext<OrderState, T> context, Behavior<OrderState, T> next)
         {
-            await SendAcceptOrder(context);
+            await SendExecutePayment(context);
             await next.Execute(context).ConfigureAwait(false);
         }
 
-        private async Task SendAcceptOrder(BehaviorContext<OrderState> context)
+        private async Task SendExecutePayment(BehaviorContext<OrderState> context)
         {
-            var sendEndpoint = await context.GetSendEndpoint(new Uri("queue:order-service"));
-            await sendEndpoint.Send<IAcceptOrder>(new
+            var sendEndpoint = await context.GetSendEndpoint(new Uri("queue:payment-service"));
+            await sendEndpoint.Send<IExecutePayment>(new
             {
                 OrderId = context.Instance.CorrelationId,
                 CustomerId = context.Instance.CustomerId,
                 Items = context.Instance.Items
             }).ConfigureAwait(false);
 
-            _logger.LogInformation("IAcceptOrder command was sent. CorrelationId: " + context.Instance.CorrelationId);
+            _logger.LogInformation("IExecutePayment command was sent. CorrelationId: " + context.Instance.CorrelationId);
         }
 
         public Task Faulted<TException>(BehaviorExceptionContext<OrderState, TException> context, Behavior<OrderState> next) 
