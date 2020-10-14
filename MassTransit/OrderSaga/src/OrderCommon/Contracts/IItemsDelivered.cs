@@ -1,8 +1,8 @@
 using System;
 namespace OrderCommon.Contracts
 {
-    public interface IOrderFailed : IMessage
+    public interface IItemsDelivered : IMessage
     {
-
+        
     }
 }

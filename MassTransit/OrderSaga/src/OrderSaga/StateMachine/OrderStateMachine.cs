@@ -17,15 +17,10 @@ namespace OrderSaga.StateMachine
         public State PaymentCompleted { get; private set; }
         public State PaymentFailed { get; private set; }
         public State Delivered { get; private set; }
-        public State DeliveryFailed { get; private set; }
 
-        public Event<ISubmitOrder> SubmitOrderEvent { get; private set; }
-        public Event<IOrderAccepted> OrderAcceptedEvent { get; private set; }
-        public Event<IOrderRejected> OrderRejectedEvent { get; private set; }
-        public Event<IPaymentCompleted> PaymentCompletedEvent { get; private set; }
-        public Event<IPaymentFailed> PaymentFailedEvent { get; private set; }
-        public Event<IDeliveryCompleted> DeliveryCompletedEvent { get; private set; }
-        public Event<IDeliveryFailed> DeliveryFailedEvent { get; private set; }
+        public Event<ISubmitOrder> SubmitOrder { get; private set; }
+        public Event<IOrderAccepted> OrderAccepted { get; private set; }
+        public Event<IOrderRejected> OrderRejected { get; private set; }
 
         private ILogger<OrderStateMachine> _logger;
 
@@ -35,7 +30,7 @@ namespace OrderSaga.StateMachine
 
             InstanceState(x => x.CurrentState);
 
-            Event(() => SubmitOrderEvent, x => x.CorrelateById(context => context.Message.OrderId).SelectId(c =>
+            Event(() => SubmitOrder, x => x.CorrelateById(context => context.Message.OrderId).SelectId(c =>
                 {
                     if (c.Message.OrderId != null && c.Message.OrderId != Guid.Empty)
                         return c.Message.OrderId;
@@ -43,80 +38,37 @@ namespace OrderSaga.StateMachine
                         return Guid.NewGuid();
                 }));
 
-            Event(() => OrderAcceptedEvent, x => x.CorrelateById(context => context.Message.OrderId));
-            Event(() => OrderRejectedEvent, x => x.CorrelateById(context => context.Message.OrderId));
-            Event(() => PaymentCompletedEvent, x => x.CorrelateById(context => context.Message.OrderId));
-            Event(() => PaymentFailedEvent, x => x.CorrelateById(context => context.Message.OrderId));
-            Event(() => DeliveryCompletedEvent, x => x.CorrelateById(context => context.Message.OrderId));
-            Event(() => DeliveryFailedEvent, x => x.CorrelateById(context => context.Message.OrderId));
+            Event(() => OrderAccepted, x => x.CorrelateById(context => context.Message.OrderId));
+            Event(() => OrderRejected, x => x.CorrelateById(context => context.Message.OrderId));
 
-            // TODO: write handler classes to delegate actions
             Initially(
-                When(SubmitOrderEvent)
+                When(SubmitOrder)
                     .Then(x => x.Instance.CustomerId = x.Data.CustomerId)
                     .Then(x => x.Instance.Items = x.Data.Items)
-                    .Then(context => LogStateChange<ISubmitOrder>(context))
-                    .TransitionTo(Submitted)
+                    .Then(context => LogStateChange(context.Event.Name, context.Instance, context.Data))
                     .Activity(x => x.OfInstanceType<SendAcceptOrderCommandActivity>())
                     .Publish(context => (IOrderReceived)new OrderReceived { OrderId = context.Instance.CorrelationId })
+                    .TransitionTo(Submitted)
                 );
 
-            // TODO: check for eliminate the need to create a class while publishing events
             During(Submitted,
-                When(OrderAcceptedEvent)
-                    .Then(context => LogStateChange<IOrderAccepted>(context))
+                When(OrderAccepted)
                     .TransitionTo(Accepted)
-                    .Activity(x => x.OfInstanceType<SendExecutePaymentCommandActivity>()),
-                When(OrderRejectedEvent)
-                    .Then(context => LogStateChange<IOrderRejected>(context))
+                    .Then(context => LogStateChange(context.Event.Name, context.Instance, context.Data)),
+                When(OrderRejected)
                     .TransitionTo(Rejected)
-                    .Publish(context => (IOrderFailed)new OrderFailed { OrderId = context.Instance.CorrelationId })
-                    .Finalize()
+                    .Then(context => LogStateChange(context.Event.Name, context.Instance, context.Data))
                 );
 
             During(Accepted,
-                When(PaymentCompletedEvent)
-                    .Then(context => LogStateChange<IPaymentCompleted>(context))
-                    .TransitionTo(PaymentCompleted)
-                    .Activity(x => x.OfInstanceType<SendDeliverItemsCommandActivity>()),
-                When(PaymentFailedEvent)
-                    .Then(context => LogStateChange<IPaymentFailed>(context))
-                    .TransitionTo(PaymentFailed)
-                    .Publish(context => (IOrderFailed)new OrderFailed { OrderId = context.Instance.CorrelationId })
-                    .Finalize()
+                When(SubmitOrder)
+                    .Then(context => LogStateChange(context.Event.Name, context.Instance, context.Data))
                 );
-
-            During(PaymentCompleted,
-                When(DeliveryCompletedEvent)
-                    .Then(context => LogStateChange<IDeliveryCompleted>(context))
-                    .TransitionTo(Delivered)
-                    .Publish(context => (IOrderCompleted)new OrderCompleted { OrderId = context.Instance.CorrelationId })
-                    .Finalize(),
-                When(DeliveryFailedEvent)
-                    .Then(context => LogStateChange<IDeliveryFailed>(context))
-                    .TransitionTo(DeliveryFailed)
-                    .Publish(context => (IOrderFailed)new OrderFailed { OrderId = context.Instance.CorrelationId })
-                    .Finalize()
-                );
-
-            // TODO: Log state changes effectively
-            WhenEnterAny(b => b.Then(context => LogStateChange2(context.Event.Name, context.Instance)));
-
         }
 
-        private void LogStateChange<T>(BehaviorContext<OrderState,T> context)
+        private void LogStateChange(string eventName, OrderState state, IMessage message)
         {
-            var eventName = context.Event.Name;
-            var state = context.Instance;
-            var currentState = context.Instance.CurrentState;
-            var eventMessage = context.Data;
-
-            _logger.LogInformation("State Changed: {0} -> {1}. Instance: {2}. Event: {3}", currentState, eventName, JsonSerializer.Serialize(state), JsonSerializer.Serialize(eventMessage));
-        }
-
-        private void LogStateChange2(string eventName, OrderState state)
-        {
-            _logger.LogInformation("State Enter: {0}. Instance: {1}", eventName, JsonSerializer.Serialize(state));
+            _logger.LogInformation("{0}->{1}. Instance: {2}. Data: {3}", state.CurrentState, eventName, JsonSerializer.Serialize(state), JsonSerializer.Serialize(message));
         }
     }
 }
