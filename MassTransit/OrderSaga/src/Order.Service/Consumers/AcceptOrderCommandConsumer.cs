@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Serilog;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Order.Service.Consumers
 {
     public class AcceptOrderCommandConsumer : IConsumer<IAcceptOrder>
     {
+        private static Dictionary<Guid, int> counterMap = new Dictionary<Guid, int>();
 
         public async Task Consume(ConsumeContext<IAcceptOrder> context)
         {
@@ -20,10 +23,32 @@ namespace Order.Service.Consumers
             var accepted = true;
             var reason = "";
 
-            if (orderCommand.Items == null || orderCommand.Items.Count == 0)
+            if (orderCommand.Items?.Count == 0)
             {
                 accepted = false;
-                reason = "missing items";
+                reason = "no items";
+            }
+            else if(orderCommand.Items.Any(item => item.Quantity < 0))
+            {
+                accepted = false;
+                reason = "negative quantity not accepted";
+            }
+            else if (orderCommand.Items.Any(item => item.Quantity == 0))
+            {
+                accepted = false;
+                reason = "zero quantity not accepted";
+            }
+
+            // TODO: Parametrized exceptions
+            var counter = counterMap.GetValueOrDefault(orderCommand.OrderId);
+            if(counter < 5)
+            {
+                var msg = $"Error happened when processing OrderId: {orderCommand.OrderId}. Counter: {counter}";
+                Log.Information(msg);
+
+                counterMap[orderCommand.OrderId] = counter + 1;
+
+                throw new Exception(msg);
             }
 
 
@@ -35,7 +60,7 @@ namespace Order.Service.Consumers
             else
             {
                 await context.Publish<IOrderRejected>(new { OrderId = orderCommand.OrderId, Reason = reason });
-                Log.Information($"OrderId: {orderCommand.OrderId} is rejected.");
+                Log.Information($"OrderId: {orderCommand.OrderId} is rejected. Reason: {reason}");
             }
         }
         

@@ -7,16 +7,18 @@ using System.Text.Json.Serialization;
 using Serilog;
 using System.Linq;
 
-namespace Payment.Service.Consumers
+namespace Order.Service.Consumers
 {
-    public class DeliveryFailedEventConsumer : IConsumer<IDeliveryFailed>
+    public class PaymentFailedEventConsumer : IConsumer<IPaymentFailed>
     {
 
-        public async Task Consume(ConsumeContext<IDeliveryFailed> context)
+        public async Task Consume(ConsumeContext<IPaymentFailed> context)
         {
+            await Task.CompletedTask;
+
             var orderCommand = context.Message;
 
-            Log.Information($"Delivery failed event received for OrderId: {orderCommand.OrderId}");
+            Log.Information($"Payment failed event received for OrderId: {orderCommand.OrderId}");
 
         }
         
