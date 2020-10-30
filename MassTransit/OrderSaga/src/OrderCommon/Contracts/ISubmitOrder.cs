@@ -8,6 +8,8 @@ namespace OrderCommon.Contracts
     {
         int CustomerId { get; set; }
         List<OrderItem> Items { get; set; }
-         
+
+        int OrderServiceFailCount { get; set; }
+
     }
 }

@@ -55,6 +55,7 @@ namespace OrderSaga.StateMachine
                 When(SubmitOrderEvent)
                     .Then(x => x.Instance.CustomerId = x.Data.CustomerId)
                     .Then(x => x.Instance.Items = x.Data.Items)
+                    .Then(x => x.Instance.OrderServiceFailCount = x.Data.OrderServiceFailCount)
                     .Then(context => LogStateChange<ISubmitOrder>(context))
                     .TransitionTo(Submitted)
                     .Activity(x => x.OfInstanceType<SendAcceptOrderCommandActivity>())

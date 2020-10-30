@@ -10,5 +10,6 @@ namespace Order.Api.Models
         public Guid OrderId { get; }    
         public int CustomerId { get; set; }
         public List<OrderItem> Items { get; set; }
+        public int OrderServiceFailCount { get; set; }
     }
 }

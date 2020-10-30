@@ -47,7 +47,8 @@ namespace OrderSaga.StateMachine
             {
                 OrderId = context.Instance.CorrelationId,
                 CustomerId = context.Instance.CustomerId,
-                Items = context.Instance.Items
+                Items = context.Instance.Items,
+                OrderServiceFailCount = context.Instance.OrderServiceFailCount
             }).ConfigureAwait(false);
 
             _logger.LogInformation("IAcceptOrder command was sent. CorrelationId: " + context.Instance.CorrelationId);

@@ -18,7 +18,7 @@ namespace Order.Service.Consumers
         {
             var orderCommand = context.Message;
 
-            Log.Information($"OrderId: {orderCommand.OrderId} is received.");
+            Log.Information($"OrderId: {orderCommand.OrderId} is received. FailCount: {orderCommand.OrderServiceFailCount}");
 
             var accepted = true;
             var reason = "";
@@ -39,9 +39,9 @@ namespace Order.Service.Consumers
                 reason = "zero quantity not accepted";
             }
 
-            // TODO: Parametrized exceptions
-            var counter = counterMap.GetValueOrDefault(orderCommand.OrderId);
-            if(counter < 5)
+            // TODO: Parametrized counter from input message
+            var counter = counterMap.GetValueOrDefault(orderCommand.OrderId, 1);
+            if(counter < orderCommand.OrderServiceFailCount)
             {
                 var msg = $"Error happened when processing OrderId: {orderCommand.OrderId}. Counter: {counter}";
                 Log.Information(msg);

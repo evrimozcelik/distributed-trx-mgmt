@@ -14,6 +14,8 @@ namespace Payment.Service.Consumers
 
         public async Task Consume(ConsumeContext<IDeliveryFailed> context)
         {
+            await Task.CompletedTask;
+
             var orderCommand = context.Message;
 
             Log.Information($"Delivery failed event received for OrderId: {orderCommand.OrderId}");
