@@ -12,6 +12,7 @@ using GreenPipes;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Quartz;
 
 namespace Order.Service
 {
@@ -59,28 +60,38 @@ namespace Order.Service
             return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    Uri schedulerEndpoint = new Uri("queue:scheduler");
+                    Uri schedulerEndpoint = new Uri("queue:order-service-scheduler");
 
                     services.AddMassTransit(x =>
                     {
                         x.SetKebabCaseEndpointNameFormatter();
-
+                        
                         x.AddMessageScheduler(schedulerEndpoint);
 
                         x.UsingRabbitMq((context, cfg) =>
                         {
+                            // Puts failed messages in schedulerEndpoint
                             cfg.UseMessageScheduler(schedulerEndpoint);
+
+                            // Runs Quartz service to listen schedulerEndpoint
+                            // Use persistent store in order not to loose any message
+                            cfg.UseInMemoryScheduler(schedulerEndpoint.AbsolutePath);
 
                             cfg.ReceiveEndpoint("order-service", e =>
                             {
-                                // TODO: scheduled re-delivery is not working
-                                e.UseScheduledRedelivery(r => r.Intervals(TimeSpan.FromSeconds(10)));
-                                e.UseMessageRetry(r => r.Immediate(3));
+                                // Scheduled redelivery configuration
+                                e.UseScheduledRedelivery(r => r.Intervals(TimeSpan.FromSeconds(30)));
 
+                                // Retry configuration before fail
+                                e.UseMessageRetry(r => r.Immediate(2));
+                                
                                 e.Consumer<AcceptOrderCommandConsumer>();
                                 e.Consumer<PaymentFailedEventConsumer>();
                                 e.Consumer<DeliveryFailedEventConsumer>();
+
                             });
+
+                            cfg.ConfigureEndpoints(context);
 
                         });
 
