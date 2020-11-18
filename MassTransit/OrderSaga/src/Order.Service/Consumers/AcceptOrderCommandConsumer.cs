@@ -39,7 +39,6 @@ namespace Order.Service.Consumers
                 reason = "zero quantity not accepted";
             }
 
-            // TODO: Parametrized counter from input message
             var counter = counterMap.GetValueOrDefault(orderCommand.OrderId, 1);
             if(counter < orderCommand.OrderServiceFailCount)
             {

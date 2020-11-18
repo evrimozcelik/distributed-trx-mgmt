@@ -82,6 +82,7 @@ namespace Order.Service
                                 // Scheduled redelivery configuration
                                 e.UseScheduledRedelivery(r => r.Intervals(TimeSpan.FromSeconds(30)));
 
+                                // TODO: Get retry count from configuration
                                 // Retry configuration before fail
                                 e.UseMessageRetry(r => r.Immediate(2));
                                 
